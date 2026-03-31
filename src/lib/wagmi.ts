@@ -24,7 +24,7 @@ export const config = createConfig({
   connectors,
   chains: [baseSepolia],
   transports: {
-    [baseSepolia.id]: http(),
+    [baseSepolia.id]: http('https://base-sepolia-rpc.publicnode.com'),
   },
   ssr: false,
 })
