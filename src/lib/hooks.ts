@@ -186,14 +186,18 @@ export function useContractEvents() {
     const allEvents: OnChainEvent[] = []
 
     try {
+      // Get recent block range (last ~500k blocks) to avoid 413 from public RPC
+      const currentBlock = await publicClient.getBlockNumber()
+      const fromBlock = currentBlock > 500000n ? currentBlock - 500000n : 0n
+
       // Fetch each event type separately using proper ABI
       const [regLogs, grantLogs, revokeLogs, accessLogs, approveLogs, rejectLogs] = await Promise.all([
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.DatasetRegistered, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.LicenseGranted, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.LicenseRevoked, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessRequested, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessApproved, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessRejected, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.DatasetRegistered, fromBlock, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.LicenseGranted, fromBlock, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.LicenseRevoked, fromBlock, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessRequested, fromBlock, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessApproved, fromBlock, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessRejected, fromBlock, toBlock: 'latest' }).catch(() => []),
       ])
 
       for (const log of regLogs) {
@@ -363,9 +367,12 @@ export function useResearcherNotifications(userAddress: string | undefined) {
     if (!publicClient || !userAddress) { setIsLoading(false); return }
 
     try {
+      const currentBlock = await publicClient.getBlockNumber()
+      const fromBlock = currentBlock > 500000n ? currentBlock - 500000n : 0n
+
       const [approveLogs, rejectLogs] = await Promise.all([
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessApproved, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
-        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessRejected, fromBlock: 39591253n, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessApproved, fromBlock, toBlock: 'latest' }).catch(() => []),
+        publicClient.getLogs({ address: NEURORIGHTS_VAULT_ADDRESS, event: EVENT_ABIS.AccessRejected, fromBlock, toBlock: 'latest' }).catch(() => []),
       ])
 
       const notifs: ResearcherNotification[] = []
