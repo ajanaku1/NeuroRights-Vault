@@ -1,0 +1,2582 @@
+<!--
+  ============================================================
+  NEURORIGHTS VAULT — "Neural Cortex" Proposal
+  DNA Code: DNA-F-H-I-G-X
+  ============================================================
+
+  UX ARCHITECTURE
+  ───────────────
+  Entry:      Landing page (public)
+  Exit:       Dashboard with datasets managed
+  Happy Path: Landing → Connect Wallet → Dashboard → Upload EEG → Grant License → Monitor Activity
+
+  SCREENS:
+  1. Landing/Hero        — Immersive neural particle system, core messaging
+  2. Dashboard/Vault     — Stats, dataset cards, neurorights score
+  3. Upload Flow         — Multi-step: select → preview → encrypt → IPFS → register → complete
+  4. Licenses Management — Grant/revoke access, researcher cards
+  5. Explore             — Browse datasets, search, request access
+  6. Activity Feed       — Real-time event log
+
+  STATES:
+  - Loading:  Skeleton pulsing with neural patterns
+  - Empty:    Forward-guiding CTA
+  - Error:    Recovery path
+  - Success:  Confirmation with animation
+
+  INSPIRATION:
+  Cyberpunk Interfaces (neon accents, scan lines, angular shapes, terminal aesthetics)
+  + Afrofuturism (African geometric patterns, gold accents on dark, cosmic imagery, purple/gold)
+
+  DNA GENES:
+  F — Full-bleed layout (edge-to-edge, no margins)
+  H — Hidden navigation (floating trigger, slide-in panel)
+  I — Immersive hero (animated particle background)
+  G — Gradient-heavy (teal→gold, emerald→cyan, midnight→coral)
+  X — Mixed typography (Space Grotesk + Crimson Pro)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroRights Vault — Neural Cortex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========== CSS VARIABLES ========== */
+:root {
+  --bg-void: #07060b;
+  --bg-deep: #0c0a14;
+  --bg-surface: #13101e;
+  --bg-elevated: #1a1628;
+  --bg-card: #1e1a2e;
+  --bg-card-hover: #252038;
+
+  --gold-100: #fef3c7;
+  --gold-200: #fde68a;
+  --gold-300: #fcd34d;
+  --gold-400: #f5b642;
+  --gold-500: #d4972e;
+  --gold-shimmer: #ffe8a0;
+
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+
+  --coral-400: #fb7185;
+  --coral-500: #f43f5e;
+
+  --cyan-300: #67e8f9;
+  --cyan-400: #22d3ee;
+
+  --purple-300: #c084fc;
+  --purple-400: #a855f7;
+  --purple-500: #9333ea;
+
+  --text-primary: #f0ece4;
+  --text-secondary: #a8a0b8;
+  --text-muted: #6b6280;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-accent: rgba(212, 151, 46, 0.3);
+
+  --gradient-teal-gold: linear-gradient(135deg, var(--teal-500), var(--gold-400));
+  --gradient-emerald-cyan: linear-gradient(135deg, var(--emerald-500), var(--cyan-400));
+  --gradient-midnight-coral: linear-gradient(135deg, #1a0533, var(--coral-400));
+  --gradient-deep-gold: linear-gradient(135deg, var(--bg-void), var(--gold-500));
+  --gradient-cosmic: linear-gradient(160deg, #0d0520, #1a0a2e, #0a1628);
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Crimson Pro', Georgia, serif;
+  --font-mono: 'Space Grotesk', monospace;
+}
+
+/* ========== RESET & BASE ========== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ========== SCAN LINE OVERLAY ========== */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  animation: scanMove 8s linear infinite;
+}
+
+@keyframes scanMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* ========== DNA BADGE ========== */
+.dna-badge {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10000;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  padding: 0.5rem 0.75rem;
+  background: rgba(7, 6, 11, 0.85);
+  border: 1px solid var(--border-accent);
+  color: var(--gold-300);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+/* ========== HIDDEN NAV (Gene H) ========== */
+.nav-trigger {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10001;
+  width: 48px;
+  height: 48px;
+  background: rgba(7, 6, 11, 0.8);
+  border: 1px solid var(--border-accent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  transition: background 200ms var(--ease-out-expo);
+}
+
+.nav-trigger:hover { background: rgba(26, 22, 40, 0.9); }
+
+.nav-trigger span {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: var(--gold-300);
+  transition: transform 250ms var(--ease-out-expo), opacity 200ms;
+}
+
+.nav-trigger.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-trigger.active span:nth-child(2) { opacity: 0; }
+.nav-trigger.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+.nav-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.nav-panel.open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.nav-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 6, 11, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out-expo);
+}
+
+.nav-panel.open .nav-backdrop { opacity: 1; }
+
+.nav-drawer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: min(340px, 85vw);
+  height: 100%;
+  background: var(--bg-deep);
+  border-right: 1px solid var(--border-accent);
+  transform: translateX(-100%);
+  transition: transform 350ms var(--ease-out-expo);
+  display: flex;
+  flex-direction: column;
+  padding: 5rem 2rem 2rem;
+}
+
+.nav-panel.open .nav-drawer { transform: translateX(0); }
+
+.nav-drawer a {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  transform: translateX(-20px);
+  opacity: 0;
+  transition: transform 300ms var(--ease-out-expo), opacity 300ms, color 200ms;
+}
+
+.nav-panel.open .nav-drawer a {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.nav-panel.open .nav-drawer a:nth-child(1) { transition-delay: 80ms; }
+.nav-panel.open .nav-drawer a:nth-child(2) { transition-delay: 120ms; }
+.nav-panel.open .nav-drawer a:nth-child(3) { transition-delay: 160ms; }
+.nav-panel.open .nav-drawer a:nth-child(4) { transition-delay: 200ms; }
+.nav-panel.open .nav-drawer a:nth-child(5) { transition-delay: 240ms; }
+.nav-panel.open .nav-drawer a:nth-child(6) { transition-delay: 280ms; }
+
+.nav-drawer a:hover { color: var(--gold-300); }
+
+.nav-drawer .nav-footer {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+}
+
+/* ========== SECTION BASE ========== */
+section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.section-inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+}
+
+@media (max-width: 768px) {
+  .section-inner { padding: 4rem 1.25rem; }
+}
+
+/* ========== SECTION LABELS ========== */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-400);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--gold-400);
+}
+
+/* ========== HEADINGS ========== */
+h1, h2, h3, h4 { font-family: var(--font-heading); line-height: 1.15; }
+h1 { font-weight: 700; }
+h2 { font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; }
+h3 { font-size: 1.1rem; font-weight: 500; }
+h4 { font-size: 0.9rem; font-weight: 500; }
+
+/* ========== BUTTONS ========== */
+.btn {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 0.875rem 2rem;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 48px;
+  min-width: 48px;
+  transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--gradient-teal-gold);
+  color: var(--bg-void);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 30px rgba(20, 184, 166, 0.3), 0 0 60px rgba(212, 151, 46, 0.15);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--gold-300);
+  border: 1px solid var(--border-accent);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.btn-secondary:hover {
+  background: rgba(212, 151, 46, 0.08);
+  border-color: var(--gold-400);
+}
+
+.btn-small {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.75rem;
+  min-height: 36px;
+}
+
+/* Magnetic hover effect container */
+.magnetic-wrap {
+  display: inline-block;
+  position: relative;
+}
+
+/* Ripple effect */
+.btn .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(0);
+  animation: rippleAnim 500ms var(--ease-out-expo) forwards;
+  pointer-events: none;
+}
+
+@keyframes rippleAnim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ========== HERO (Gene I — Immersive) ========== */
+#hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-void);
+  min-height: 100vh;
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 80%, rgba(7, 6, 11, 0.3) 0%, rgba(7, 6, 11, 0.85) 70%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  padding: 0 2rem;
+}
+
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal-400);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 800ms var(--ease-out-expo) 300ms forwards;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  background: var(--gradient-teal-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.25rem;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeUp 900ms var(--ease-out-expo) 500ms forwards;
+}
+
+.hero-sub {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 300;
+  color: var(--text-secondary);
+  max-width: 540px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 800ms var(--ease-out-expo) 700ms forwards;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 800ms var(--ease-out-expo) 900ms forwards;
+}
+
+@keyframes heroFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+  animation: heroFadeUp 600ms var(--ease-out-expo) 1400ms forwards;
+}
+
+.hero-scroll-hint span {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--gold-400), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+
+/* Afrofuturist geometric border on hero */
+.hero-geo-border {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 28px,
+    var(--gold-500) 28px,
+    var(--gold-500) 30px
+  );
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.12), transparent);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.12), transparent);
+}
+
+/* ========== DASHBOARD SECTION ========== */
+#dashboard {
+  background: var(--gradient-cosmic);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border-subtle);
+  margin-bottom: 3rem;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-teal-gold);
+  opacity: 0;
+  transition: opacity 250ms var(--ease-out-expo);
+}
+
+.stat-card:hover::after { opacity: 1; }
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.stat-value {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--gradient-teal-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-change {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  color: var(--emerald-400);
+}
+
+.stat-change.negative { color: var(--coral-400); }
+
+/* Neurorights Score Gauge */
+.neuro-score {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  padding: 2rem;
+  margin-bottom: 3rem;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+}
+
+.score-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.score-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+  fill: none;
+  stroke: var(--bg-elevated);
+  stroke-width: 6;
+}
+
+.score-ring-fill {
+  fill: none;
+  stroke: url(#scoreGradient);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 314;
+  stroke-dashoffset: 314;
+  transition: stroke-dashoffset 1500ms var(--ease-out-expo);
+}
+
+.score-ring .score-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gold-300);
+}
+
+.score-info h3 { color: var(--text-primary); margin-bottom: 0.5rem; }
+.score-info p { color: var(--text-secondary); font-size: 0.95rem; }
+
+/* Dataset Cards */
+.dataset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.dataset-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  transform: translateY(0);
+  transition: transform 250ms var(--ease-out-expo), border-color 250ms;
+}
+
+.dataset-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-accent);
+}
+
+.dataset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dataset-type {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.625rem;
+  background: rgba(20, 184, 166, 0.12);
+  color: var(--teal-400);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+.dataset-encrypted {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald-400);
+  box-shadow: 0 0 8px var(--emerald-400);
+  animation: pulse-dot 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 4px var(--emerald-400); }
+  50% { box-shadow: 0 0 12px var(--emerald-400), 0 0 24px rgba(16, 185, 129, 0.3); }
+}
+
+.dataset-name {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.dataset-meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* EEG Mini Waveform in card */
+.eeg-mini {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.eeg-mini canvas { width: 100%; height: 100%; }
+
+.dataset-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ========== UPLOAD FLOW ========== */
+#upload {
+  background: var(--bg-deep);
+}
+
+.upload-steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 3rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.upload-step {
+  flex: 1;
+  min-width: 140px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border-subtle);
+  position: relative;
+  transition: color 250ms var(--ease-out-expo), border-color 250ms;
+}
+
+.upload-step.active {
+  color: var(--gold-300);
+  border-bottom-color: var(--gold-400);
+}
+
+.upload-step.completed {
+  color: var(--teal-400);
+  border-bottom-color: var(--teal-500);
+}
+
+.upload-step .step-num {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  margin-bottom: 0.25rem;
+}
+
+.upload-area {
+  background: var(--bg-surface);
+  border: 2px dashed var(--border-accent);
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  transition: border-color 250ms var(--ease-out-expo), background 250ms;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  border-color: var(--gold-400);
+  background: var(--bg-elevated);
+}
+
+.upload-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+}
+
+.upload-icon svg { width: 100%; height: 100%; }
+
+.upload-area h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.upload-area p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.upload-formats {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+/* EEG Preview Chart */
+.eeg-preview {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 1.5rem;
+  margin-top: 2rem;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+.eeg-chart {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.eeg-chart canvas { width: 100%; height: 100%; }
+
+.encrypt-progress {
+  margin-top: 2rem;
+}
+
+.progress-bar-track {
+  height: 4px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--gradient-teal-gold);
+  width: 0%;
+  transition: width 600ms var(--ease-out-expo);
+}
+
+.progress-status {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ========== LICENSES SECTION ========== */
+#licenses {
+  background: var(--bg-void);
+}
+
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+.license-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 1.5rem;
+  position: relative;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  transition: transform 250ms var(--ease-out-expo), border-color 250ms;
+}
+
+.license-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-accent);
+}
+
+.license-card.revoked { opacity: 0.55; }
+
+.license-researcher {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.researcher-avatar {
+  width: 44px;
+  height: 44px;
+  background: var(--gradient-emerald-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--bg-void);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.researcher-info h4 { color: var(--text-primary); }
+
+.researcher-info span {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.license-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.license-status.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--emerald-400);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.license-status.pending {
+  background: rgba(245, 182, 66, 0.1);
+  color: var(--gold-300);
+  border: 1px solid rgba(245, 182, 66, 0.2);
+}
+
+.license-status.revoked-badge {
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--coral-400);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.license-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.license-details {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.license-detail-label { color: var(--text-muted); }
+.license-detail-value { color: var(--text-secondary); text-align: right; }
+
+.license-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ========== EXPLORE SECTION ========== */
+#explore {
+  background: var(--gradient-cosmic);
+}
+
+.explore-search {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 240px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 0.875rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition: border-color 200ms;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--gold-400);
+}
+
+.search-input::placeholder { color: var(--text-muted); }
+
+.filter-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.filter-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  min-height: 36px;
+  transition: background 200ms var(--ease-out-expo), color 200ms, border-color 200ms;
+}
+
+.filter-tag:hover, .filter-tag.active {
+  background: rgba(212, 151, 46, 0.1);
+  color: var(--gold-300);
+  border-color: var(--border-accent);
+}
+
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.explore-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  padding: 1.5rem;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: transform 250ms var(--ease-out-expo), border-color 250ms;
+}
+
+.explore-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-accent);
+}
+
+.explore-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.data-type-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+}
+
+.data-type-badge.eeg { background: rgba(20, 184, 166, 0.12); color: var(--teal-400); }
+.data-type-badge.fmri { background: rgba(168, 85, 247, 0.12); color: var(--purple-300); }
+.data-type-badge.fnirs { background: rgba(244, 63, 94, 0.12); color: var(--coral-400); }
+
+.explore-card h4 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.explore-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.explore-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+/* ========== ACTIVITY FEED ========== */
+#activity {
+  background: var(--bg-deep);
+}
+
+.feed-container {
+  max-width: 800px;
+}
+
+.feed-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  opacity: 0;
+  transform: translateX(-12px);
+}
+
+.feed-item.visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 400ms var(--ease-out-expo), transform 400ms var(--ease-out-expo);
+}
+
+.feed-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+}
+
+.feed-dot.upload { background: var(--teal-400); box-shadow: 0 0 8px rgba(20, 184, 166, 0.4); }
+.feed-dot.license { background: var(--gold-400); box-shadow: 0 0 8px rgba(245, 182, 66, 0.4); }
+.feed-dot.revoke { background: var(--coral-400); box-shadow: 0 0 8px rgba(244, 63, 94, 0.4); }
+.feed-dot.access { background: var(--purple-400); box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
+.feed-dot.earning { background: var(--emerald-400); box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+
+.feed-content { flex: 1; }
+
+.feed-content p {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.feed-content p strong {
+  font-family: var(--font-heading);
+  font-weight: 500;
+}
+
+.feed-time {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.feed-hash {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--teal-400);
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+/* ========== AFROFUTURIST GEOMETRIC PATTERNS ========== */
+.afro-pattern {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.04;
+}
+
+.afro-pattern svg { width: 100%; height: 100%; }
+
+/* Gold shimmer animation */
+@keyframes goldShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gold-500) 0%,
+    var(--gold-shimmer) 50%,
+    var(--gold-500) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 4s ease-in-out infinite;
+}
+
+/* ========== FOOTER ========== */
+footer {
+  background: var(--bg-void);
+  border-top: 1px solid var(--border-subtle);
+  padding: 3rem 2rem;
+}
+
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.footer-brand {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+}
+
+.footer-inspiration {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-muted);
+  max-width: 360px;
+  text-align: right;
+  line-height: 1.6;
+}
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-500); }
+
+/* ========== REDUCED MOTION ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scanlines { display: none; }
+  #hero-canvas { display: none; }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .dataset-grid, .license-grid, .explore-grid { grid-template-columns: 1fr; }
+  .neuro-score { flex-direction: column; text-align: center; }
+  .explore-search { flex-direction: column; }
+  .hero-title { font-size: 2.25rem; }
+  .footer-inner { flex-direction: column; align-items: flex-start; }
+  .footer-inspiration { text-align: left; }
+}
+
+/* ========== AFRO GEO DECORATION ========== */
+.geo-diamond {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 1px solid rgba(212, 151, 46, 0.06);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.geo-diamond::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border: 1px solid rgba(212, 151, 46, 0.04);
+}
+
+.geo-diamond::after {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  border: 1px solid rgba(212, 151, 46, 0.03);
+}
+
+/* Section divider — afrofuturist pattern */
+.section-divider {
+  width: 100%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gold-500) 0px,
+    var(--gold-500) 4px,
+    transparent 4px,
+    transparent 8px,
+    var(--teal-500) 8px,
+    var(--teal-500) 12px,
+    transparent 12px,
+    transparent 20px
+  );
+  opacity: 0.3;
+}
+
+/* ========== SKELETON LOADING STATE (for demo) ========== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    var(--bg-card) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ========== SUCCESS CONFIRMATION MODAL ========== */
+.success-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 6, 11, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.success-modal.visible { display: flex; }
+
+.success-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  padding: 3rem;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  transform: scale(0.93);
+  opacity: 0;
+  transition: transform 350ms var(--ease-out-expo), opacity 300ms;
+}
+
+.success-modal.visible .success-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1.5rem;
+  background: var(--gradient-teal-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.success-icon svg { width: 28px; height: 28px; }
+
+/* ========== PARTICLES OVERLAY ========== */
+.particles-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--gold-400);
+  border-radius: 50%;
+  opacity: 0.15;
+}
+</style>
+</head>
+<body>
+<!-- Scan line overlay -->
+<div class="scanlines" aria-hidden="true"></div>
+
+<!-- DNA Badge -->
+<div class="dna-badge" aria-label="Design DNA Code">DNA-F-H-I-G-X</div>
+
+<!-- Hidden Navigation (Gene H) -->
+<button class="nav-trigger" id="navTrigger" aria-label="Toggle navigation" aria-expanded="false">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<nav class="nav-panel" id="navPanel" role="navigation" aria-label="Main navigation">
+  <div class="nav-backdrop" id="navBackdrop"></div>
+  <div class="nav-drawer">
+    <a href="#hero">Neural Cortex</a>
+    <a href="#dashboard">Vault Dashboard</a>
+    <a href="#upload">Upload Data</a>
+    <a href="#licenses">Licenses</a>
+    <a href="#explore">Explore</a>
+    <a href="#activity">Activity</a>
+    <div class="nav-footer">
+      NeuroRights Vault v0.1<br>
+      Brain Data Sovereignty Protocol<br>
+      Solana Mainnet
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- SCREEN 1: HERO / LANDING (Gene I — Immersive)                -->
+<!-- ============================================================ -->
+<section id="hero">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-overlay"></div>
+
+  <!-- Afrofuturist geometric accents -->
+  <div class="geo-diamond" style="top: 10%; right: -100px;" aria-hidden="true"></div>
+  <div class="geo-diamond" style="bottom: 15%; left: -120px;" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <p class="hero-tag">NeuroRights Vault / Brain Data Sovereignty</p>
+    <h1 class="hero-title">Your brain data. Your rules.</h1>
+    <p class="hero-sub">
+      Encrypt, store, license, and revoke access to your neural data on-chain.
+      Sovereign control over the most intimate data that exists.
+    </p>
+    <div class="hero-actions">
+      <div class="magnetic-wrap">
+        <button class="btn btn-primary" id="connectWallet">Connect Wallet</button>
+      </div>
+      <div class="magnetic-wrap">
+        <button class="btn btn-secondary" onclick="document.getElementById('explore').scrollIntoView({behavior:'smooth'})">Explore Datasets</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+
+  <div class="hero-geo-border" aria-hidden="true"></div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 2: DASHBOARD / VAULT                                  -->
+<!-- ============================================================ -->
+<section id="dashboard">
+  <div class="particles-bg" aria-hidden="true" data-particles="dashboard"></div>
+  <div class="section-inner">
+    <div class="section-label">Vault Dashboard</div>
+    <h2>Neural Data Command Center</h2>
+    <p style="color: var(--text-secondary); max-width: 560px; margin-bottom: 2.5rem; font-size: 1.05rem;">
+      Monitor your encrypted datasets, active licenses, earnings, and sovereignty score in real time.
+    </p>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" role="list" aria-label="Vault statistics">
+      <div class="stat-card" role="listitem">
+        <div class="stat-label">Datasets Stored</div>
+        <div class="stat-value" data-count="47">0</div>
+        <div class="stat-change">+3 this week</div>
+      </div>
+      <div class="stat-card" role="listitem">
+        <div class="stat-label">Active Licenses</div>
+        <div class="stat-value" data-count="12">0</div>
+        <div class="stat-change">+2 this month</div>
+      </div>
+      <div class="stat-card" role="listitem">
+        <div class="stat-label">Total Earnings</div>
+        <div class="stat-value" data-count="8420" data-prefix="" data-suffix=" SOL">0</div>
+        <div class="stat-change">+840 SOL this month</div>
+      </div>
+      <div class="stat-card" role="listitem">
+        <div class="stat-label">Access Requests</div>
+        <div class="stat-value" data-count="5">0</div>
+        <div class="stat-change negative">3 pending review</div>
+      </div>
+    </div>
+
+    <!-- NeuroRights Score -->
+    <div class="neuro-score">
+      <div class="score-ring">
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color: var(--teal-400)" />
+              <stop offset="100%" style="stop-color: var(--gold-400)" />
+            </linearGradient>
+          </defs>
+          <circle class="score-ring-bg" cx="60" cy="60" r="50" />
+          <circle class="score-ring-fill" cx="60" cy="60" r="50" data-target="87" />
+        </svg>
+        <div class="score-number">87</div>
+      </div>
+      <div class="score-info">
+        <h3>NeuroRights Sovereignty Score</h3>
+        <p>
+          Your data sovereignty is strong. All datasets are encrypted with AES-256, stored on IPFS,
+          and registered on-chain. You have full revocation control over every license granted.
+        </p>
+      </div>
+    </div>
+
+    <!-- Dataset Cards -->
+    <div class="section-label" style="margin-bottom: 1.5rem;">Your Datasets</div>
+    <div class="dataset-grid" role="list" aria-label="Your neural datasets">
+      <article class="dataset-card" role="listitem">
+        <div class="dataset-header">
+          <span class="dataset-type">EEG</span>
+          <div class="dataset-encrypted" title="Encrypted"></div>
+        </div>
+        <h3 class="dataset-name">Resting-State Alpha Waves</h3>
+        <div class="dataset-meta">
+          <span>64 channels</span>
+          <span>2.4 GB</span>
+          <span>3 licenses</span>
+        </div>
+        <div class="eeg-mini" aria-hidden="true"><canvas data-eeg-mini="1"></canvas></div>
+        <div class="dataset-actions">
+          <button class="btn btn-secondary btn-small">Manage</button>
+          <button class="btn btn-secondary btn-small">Revoke All</button>
+        </div>
+      </article>
+
+      <article class="dataset-card" role="listitem">
+        <div class="dataset-header">
+          <span class="dataset-type">EEG</span>
+          <div class="dataset-encrypted" title="Encrypted"></div>
+        </div>
+        <h3 class="dataset-name">P300 Event-Related Potentials</h3>
+        <div class="dataset-meta">
+          <span>32 channels</span>
+          <span>1.1 GB</span>
+          <span>5 licenses</span>
+        </div>
+        <div class="eeg-mini" aria-hidden="true"><canvas data-eeg-mini="2"></canvas></div>
+        <div class="dataset-actions">
+          <button class="btn btn-secondary btn-small">Manage</button>
+          <button class="btn btn-secondary btn-small">Revoke All</button>
+        </div>
+      </article>
+
+      <article class="dataset-card" role="listitem">
+        <div class="dataset-header">
+          <span class="dataset-type" style="background: rgba(168, 85, 247, 0.12); color: var(--purple-300); border-color: rgba(168, 85, 247, 0.2);">fNIRS</span>
+          <div class="dataset-encrypted" title="Encrypted"></div>
+        </div>
+        <h3 class="dataset-name">Prefrontal Cortex Hemodynamics</h3>
+        <div class="dataset-meta">
+          <span>16 channels</span>
+          <span>890 MB</span>
+          <span>2 licenses</span>
+        </div>
+        <div class="eeg-mini" aria-hidden="true"><canvas data-eeg-mini="3"></canvas></div>
+        <div class="dataset-actions">
+          <button class="btn btn-secondary btn-small">Manage</button>
+          <button class="btn btn-secondary btn-small">Revoke All</button>
+        </div>
+      </article>
+
+      <article class="dataset-card" role="listitem">
+        <div class="dataset-header">
+          <span class="dataset-type">EEG</span>
+          <div class="dataset-encrypted" title="Encrypted"></div>
+        </div>
+        <h3 class="dataset-name">Sleep Stage Classification Set</h3>
+        <div class="dataset-meta">
+          <span>128 channels</span>
+          <span>5.7 GB</span>
+          <span>2 licenses</span>
+        </div>
+        <div class="eeg-mini" aria-hidden="true"><canvas data-eeg-mini="4"></canvas></div>
+        <div class="dataset-actions">
+          <button class="btn btn-secondary btn-small">Manage</button>
+          <button class="btn btn-secondary btn-small">Revoke All</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 3: UPLOAD FLOW                                        -->
+<!-- ============================================================ -->
+<section id="upload">
+  <div class="section-inner">
+    <div class="section-label">Upload Neural Data</div>
+    <h2>Secure Your Brain Data On-Chain</h2>
+    <p style="color: var(--text-secondary); max-width: 560px; margin-bottom: 2.5rem; font-size: 1.05rem;">
+      Your neural data is encrypted client-side before it ever leaves your device. Once on IPFS,
+      it is registered on-chain for immutable provenance.
+    </p>
+
+    <!-- Upload Steps -->
+    <div class="upload-steps" role="tablist" aria-label="Upload progress">
+      <div class="upload-step completed" role="tab">
+        <span class="step-num">01</span>
+        Select
+      </div>
+      <div class="upload-step completed" role="tab">
+        <span class="step-num">02</span>
+        Preview
+      </div>
+      <div class="upload-step active" role="tab" aria-selected="true">
+        <span class="step-num">03</span>
+        Encrypt
+      </div>
+      <div class="upload-step" role="tab">
+        <span class="step-num">04</span>
+        IPFS
+      </div>
+      <div class="upload-step" role="tab">
+        <span class="step-num">05</span>
+        Register
+      </div>
+      <div class="upload-step" role="tab">
+        <span class="step-num">06</span>
+        Complete
+      </div>
+    </div>
+
+    <!-- Upload Area -->
+    <div class="upload-area" role="button" tabindex="0" aria-label="Drop EEG files here or click to browse">
+      <div class="upload-icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" stroke="var(--gold-300)" stroke-width="1.5">
+          <path d="M32 44V20M24 28l8-8 8 8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 40v8a4 4 0 004 4h32a4 4 0 004-4v-8" stroke-linecap="round"/>
+          <circle cx="32" cy="12" r="4" stroke-dasharray="3 3" opacity="0.4"/>
+        </svg>
+      </div>
+      <h3>Drop your neural data files here</h3>
+      <p>Or click to browse your local filesystem</p>
+      <div class="upload-formats">Supported: .edf .bdf .gdf .eeg .set .fif .nii .snirf</div>
+    </div>
+
+    <!-- EEG Preview -->
+    <div class="eeg-preview">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h4 style="color: var(--text-primary); margin-bottom: 0.25rem;">EEG Signal Preview</h4>
+          <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);">
+            resting_alpha_session03.edf / 64 channels / 256 Hz
+          </span>
+        </div>
+        <span class="dataset-type">Live Preview</span>
+      </div>
+      <div class="eeg-chart">
+        <canvas id="eegPreviewChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Encryption Progress -->
+    <div class="encrypt-progress">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <span style="font-family: var(--font-heading); font-size: 0.9rem; color: var(--text-primary);">Encrypting with AES-256-GCM</span>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--gold-300);" id="encryptPercent">0%</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="encryptBar"></div>
+      </div>
+      <div class="progress-status">
+        <span id="encryptStatus">Initializing encryption engine...</span>
+        <span>2.4 GB total</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 4: LICENSES MANAGEMENT                                -->
+<!-- ============================================================ -->
+<section id="licenses">
+  <div class="geo-diamond" style="top: 5%; right: -80px;" aria-hidden="true"></div>
+  <div class="section-inner">
+    <div class="section-label">License Control</div>
+    <h2>Who Accesses Your Neural Data</h2>
+    <p style="color: var(--text-secondary); max-width: 560px; margin-bottom: 2.5rem; font-size: 1.05rem;">
+      Grant time-limited, purpose-bound licenses to researchers. Revoke access instantly
+      with a single on-chain transaction. Your data, your terms.
+    </p>
+
+    <div class="license-grid" role="list" aria-label="Active licenses">
+      <!-- License 1 — Active -->
+      <article class="license-card" role="listitem">
+        <div class="license-researcher">
+          <div class="researcher-avatar">MK</div>
+          <div class="researcher-info">
+            <h4>Dr. Miriam Kwame</h4>
+            <span>University of Cape Town / Neuroscience Dept.</span>
+          </div>
+        </div>
+        <div class="license-status active">
+          <div class="license-status-dot"></div>
+          Active
+        </div>
+        <div class="license-details">
+          <span class="license-detail-label">Dataset</span>
+          <span class="license-detail-value">Resting-State Alpha</span>
+          <span class="license-detail-label">Purpose</span>
+          <span class="license-detail-value">Research / Non-Commercial</span>
+          <span class="license-detail-label">Expires</span>
+          <span class="license-detail-value">2026-09-15</span>
+          <span class="license-detail-label">Fee</span>
+          <span class="license-detail-value">120 SOL</span>
+        </div>
+        <div class="license-actions">
+          <button class="btn btn-secondary btn-small">Extend</button>
+          <button class="btn btn-secondary btn-small" style="border-color: rgba(244, 63, 94, 0.3); color: var(--coral-400);">Revoke</button>
+        </div>
+      </article>
+
+      <!-- License 2 — Active -->
+      <article class="license-card" role="listitem">
+        <div class="license-researcher">
+          <div class="researcher-avatar" style="background: var(--gradient-midnight-coral);">AT</div>
+          <div class="researcher-info">
+            <h4>Dr. Adisa Toure</h4>
+            <span>MIT Media Lab / BCI Group</span>
+          </div>
+        </div>
+        <div class="license-status active">
+          <div class="license-status-dot"></div>
+          Active
+        </div>
+        <div class="license-details">
+          <span class="license-detail-label">Dataset</span>
+          <span class="license-detail-value">P300 ERP</span>
+          <span class="license-detail-label">Purpose</span>
+          <span class="license-detail-value">BCI Development</span>
+          <span class="license-detail-label">Expires</span>
+          <span class="license-detail-value">2026-12-01</span>
+          <span class="license-detail-label">Fee</span>
+          <span class="license-detail-value">250 SOL</span>
+        </div>
+        <div class="license-actions">
+          <button class="btn btn-secondary btn-small">Extend</button>
+          <button class="btn btn-secondary btn-small" style="border-color: rgba(244, 63, 94, 0.3); color: var(--coral-400);">Revoke</button>
+        </div>
+      </article>
+
+      <!-- License 3 — Pending -->
+      <article class="license-card" role="listitem">
+        <div class="license-researcher">
+          <div class="researcher-avatar" style="background: var(--gradient-deep-gold); color: var(--gold-300);">JN</div>
+          <div class="researcher-info">
+            <h4>Dr. Jun Nakamura</h4>
+            <span>RIKEN / Brain Science Institute</span>
+          </div>
+        </div>
+        <div class="license-status pending">
+          <div class="license-status-dot"></div>
+          Pending Approval
+        </div>
+        <div class="license-details">
+          <span class="license-detail-label">Dataset</span>
+          <span class="license-detail-value">Sleep Stages</span>
+          <span class="license-detail-label">Purpose</span>
+          <span class="license-detail-value">Clinical Research</span>
+          <span class="license-detail-label">Requested</span>
+          <span class="license-detail-value">2026-03-28</span>
+          <span class="license-detail-label">Offered Fee</span>
+          <span class="license-detail-value">380 SOL</span>
+        </div>
+        <div class="license-actions">
+          <button class="btn btn-primary btn-small">Approve</button>
+          <button class="btn btn-secondary btn-small" style="border-color: rgba(244, 63, 94, 0.3); color: var(--coral-400);">Decline</button>
+        </div>
+      </article>
+
+      <!-- License 4 — Revoked -->
+      <article class="license-card revoked" role="listitem">
+        <div class="license-researcher">
+          <div class="researcher-avatar" style="background: var(--bg-elevated); color: var(--text-muted);">CL</div>
+          <div class="researcher-info">
+            <h4>NeuroLink Corp.</h4>
+            <span>Commercial Entity / San Francisco</span>
+          </div>
+        </div>
+        <div class="license-status revoked-badge">
+          <div class="license-status-dot"></div>
+          Revoked
+        </div>
+        <div class="license-details">
+          <span class="license-detail-label">Dataset</span>
+          <span class="license-detail-value">Resting-State Alpha</span>
+          <span class="license-detail-label">Reason</span>
+          <span class="license-detail-value">Terms Violation</span>
+          <span class="license-detail-label">Revoked On</span>
+          <span class="license-detail-value">2026-02-14</span>
+          <span class="license-detail-label">Refunded</span>
+          <span class="license-detail-value">0 SOL</span>
+        </div>
+        <div class="license-actions">
+          <button class="btn btn-secondary btn-small" disabled style="opacity: 0.4; cursor: not-allowed;">Access Terminated</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 5: EXPLORE                                            -->
+<!-- ============================================================ -->
+<section id="explore">
+  <div class="section-inner">
+    <div class="section-label">Explore Neural Datasets</div>
+    <h2>Discover Sovereign Brain Data</h2>
+    <p style="color: var(--text-secondary); max-width: 560px; margin-bottom: 2.5rem; font-size: 1.05rem;">
+      Browse consented neural datasets from individuals who maintain full control.
+      Request access under their terms — no intermediaries.
+    </p>
+
+    <div class="explore-search">
+      <input type="search" class="search-input" placeholder="Search datasets by type, region, paradigm..." aria-label="Search datasets">
+      <button class="btn btn-primary btn-small">Search Vault</button>
+    </div>
+
+    <div class="filter-tags" role="group" aria-label="Data type filters">
+      <button class="filter-tag active">All</button>
+      <button class="filter-tag">EEG</button>
+      <button class="filter-tag">fMRI</button>
+      <button class="filter-tag">fNIRS</button>
+      <button class="filter-tag">MEG</button>
+      <button class="filter-tag">BCI</button>
+      <button class="filter-tag">Sleep</button>
+    </div>
+
+    <div class="explore-grid" role="list" aria-label="Available datasets">
+      <article class="explore-card" role="listitem">
+        <div class="explore-card-header">
+          <span class="data-type-badge eeg">EEG</span>
+          <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--emerald-400);">Verified</span>
+        </div>
+        <h4>Motor Imagery Classification</h4>
+        <p>High-density EEG during left/right hand motor imagery tasks. 40 sessions, 128 channels.</p>
+        <div class="explore-card-meta">
+          <span>8.2 GB</span>
+          <span>12 licensees</span>
+          <span>200 SOL</span>
+        </div>
+        <button class="btn btn-secondary btn-small" style="width: 100%;">Request Access</button>
+      </article>
+
+      <article class="explore-card" role="listitem">
+        <div class="explore-card-header">
+          <span class="data-type-badge fmri">fMRI</span>
+          <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--emerald-400);">Verified</span>
+        </div>
+        <h4>Emotional Response Mapping</h4>
+        <p>Whole-brain fMRI during emotion-evoking stimuli. Includes BOLD signal and behavioral data.</p>
+        <div class="explore-card-meta">
+          <span>24.1 GB</span>
+          <span>4 licensees</span>
+          <span>500 SOL</span>
+        </div>
+        <button class="btn btn-secondary btn-small" style="width: 100%;">Request Access</button>
+      </article>
+
+      <article class="explore-card" role="listitem">
+        <div class="explore-card-header">
+          <span class="data-type-badge fnirs">fNIRS</span>
+          <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold-300);">New</span>
+        </div>
+        <h4>Cognitive Load Assessment</h4>
+        <p>Prefrontal fNIRS during n-back tasks of increasing difficulty. 22 sessions recorded.</p>
+        <div class="explore-card-meta">
+          <span>1.8 GB</span>
+          <span>0 licensees</span>
+          <span>80 SOL</span>
+        </div>
+        <button class="btn btn-secondary btn-small" style="width: 100%;">Request Access</button>
+      </article>
+
+      <article class="explore-card" role="listitem">
+        <div class="explore-card-header">
+          <span class="data-type-badge eeg">EEG</span>
+          <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--emerald-400);">Verified</span>
+        </div>
+        <h4>Meditation State Transitions</h4>
+        <p>Long-duration EEG from experienced meditators. Captures theta/gamma shifts across states.</p>
+        <div class="explore-card-meta">
+          <span>3.4 GB</span>
+          <span>8 licensees</span>
+          <span>150 SOL</span>
+        </div>
+        <button class="btn btn-secondary btn-small" style="width: 100%;">Request Access</button>
+      </article>
+
+      <article class="explore-card" role="listitem">
+        <div class="explore-card-header">
+          <span class="data-type-badge eeg">BCI</span>
+          <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--emerald-400);">Verified</span>
+        </div>
+        <h4>SSVEP Frequency Tagging</h4>
+        <p>Steady-state visually evoked potentials at 8-15 Hz. Ideal for BCI speller research.</p>
+        <div class="explore-card-meta">
+          <span>2.1 GB</span>
+          <span>6 licensees</span>
+          <span>175 SOL</span>
+        </div>
+        <button class="btn btn-secondary btn-small" style="width: 100%;">Request Access</button>
+      </article>
+
+      <article class="explore-card" role="listitem">
+        <div class="explore-card-header">
+          <span class="data-type-badge fmri">fMRI</span>
+          <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--gold-300);">New</span>
+        </div>
+        <h4>Language Processing Networks</h4>
+        <p>Task-based fMRI during multilingual sentence comprehension. Includes Broca/Wernicke ROI masks.</p>
+        <div class="explore-card-meta">
+          <span>18.6 GB</span>
+          <span>2 licensees</span>
+          <span>420 SOL</span>
+        </div>
+        <button class="btn btn-secondary btn-small" style="width: 100%;">Request Access</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============================================================ -->
+<!-- SCREEN 6: ACTIVITY FEED                                      -->
+<!-- ============================================================ -->
+<section id="activity">
+  <div class="section-inner">
+    <div class="section-label">Activity Feed</div>
+    <h2>On-Chain Event Log</h2>
+    <p style="color: var(--text-secondary); max-width: 560px; margin-bottom: 2.5rem; font-size: 1.05rem;">
+      Every interaction with your neural data is recorded immutably. Full transparency,
+      zero trust required.
+    </p>
+
+    <div class="feed-container" role="log" aria-label="Activity feed" aria-live="polite">
+      <div class="feed-item" data-delay="0">
+        <div class="feed-dot earning"></div>
+        <div class="feed-content">
+          <p><strong>License payment received</strong> — 250 SOL from Dr. Adisa Toure for P300 ERP dataset</p>
+          <span class="feed-time">2 minutes ago<span class="feed-hash">tx:7kX9...mQ3v</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="60">
+        <div class="feed-dot license"></div>
+        <div class="feed-content">
+          <p><strong>License granted</strong> — Dr. Adisa Toure now has read access to P300 ERP dataset until 2026-12-01</p>
+          <span class="feed-time">2 minutes ago<span class="feed-hash">tx:3pR2...kL8w</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="120">
+        <div class="feed-dot access"></div>
+        <div class="feed-content">
+          <p><strong>Access request</strong> — Dr. Jun Nakamura requested access to Sleep Stage Classification Set</p>
+          <span class="feed-time">14 minutes ago<span class="feed-hash">tx:9dF4...nH2x</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="180">
+        <div class="feed-dot upload"></div>
+        <div class="feed-content">
+          <p><strong>Dataset registered</strong> — Sleep Stage Classification Set encrypted and stored on IPFS</p>
+          <span class="feed-time">1 hour ago<span class="feed-hash">tx:5mK7...pQ9r / cid:bafy...x4kn</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="240">
+        <div class="feed-dot revoke"></div>
+        <div class="feed-content">
+          <p><strong>Access revoked</strong> — NeuroLink Corp. license terminated for Resting-State Alpha dataset (terms violation)</p>
+          <span class="feed-time">2 days ago<span class="feed-hash">tx:1vB8...jW5t</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="300">
+        <div class="feed-dot earning"></div>
+        <div class="feed-content">
+          <p><strong>Royalty payment</strong> — 45 SOL recurring license fee from Dr. Miriam Kwame</p>
+          <span class="feed-time">3 days ago<span class="feed-hash">tx:8gN3...rK6m</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="360">
+        <div class="feed-dot upload"></div>
+        <div class="feed-content">
+          <p><strong>Dataset updated</strong> — Prefrontal Cortex Hemodynamics: 4 new sessions appended</p>
+          <span class="feed-time">5 days ago<span class="feed-hash">tx:2cL9...wF4p</span></span>
+        </div>
+      </div>
+
+      <div class="feed-item" data-delay="420">
+        <div class="feed-dot license"></div>
+        <div class="feed-content">
+          <p><strong>License renewed</strong> — Dr. Miriam Kwame extended access to Resting-State Alpha for 6 months</p>
+          <span class="feed-time">1 week ago<span class="feed-hash">tx:6hP1...sD7n</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SUCCESS MODAL (state example)                                -->
+<!-- ============================================================ -->
+<div class="success-modal" id="successModal" role="dialog" aria-modal="true" aria-label="Upload successful">
+  <div class="success-content">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--bg-void)" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Dataset Registered On-Chain</h3>
+    <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0.75rem;">
+      Your neural data has been encrypted, stored on IPFS, and registered on Solana. You retain full sovereignty.
+    </p>
+    <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--teal-400); margin-bottom: 1.5rem;">
+      CID: bafybeif...x4kn / TX: 7kX9...mQ3v
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('successModal').classList.remove('visible')">Return to Vault</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FOOTER                                                       -->
+<!-- ============================================================ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand gold-shimmer">Neural Cortex</div>
+      <div class="footer-copy">
+        NeuroRights Vault / Brain Data Sovereignty Protocol<br>
+        Encrypt. Store. License. Revoke. On-Chain.<br>
+        DNA-F-H-I-G-X
+      </div>
+    </div>
+    <div class="footer-inspiration">
+      Design inspired by Cyberpunk Interfaces (neon accents, scan lines, angular shapes,
+      terminal aesthetics) and Afrofuturism (African geometric patterns, gold accents on dark,
+      cosmic imagery, purple/gold palettes).
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                   -->
+<!-- ============================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // NEURAL NETWORK PARTICLE SYSTEM (Hero)
+  // ==========================================
+  const heroCanvas = document.getElementById('hero-canvas');
+  const ctx = heroCanvas.getContext('2d');
+  let particles = [];
+  let connections = [];
+  let mouseX = 0, mouseY = 0;
+  let canvasW, canvasH;
+  let animFrame;
+
+  function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvasW = heroCanvas.offsetWidth;
+    canvasH = heroCanvas.offsetHeight;
+    heroCanvas.width = canvasW * dpr;
+    heroCanvas.height = canvasH * dpr;
+    ctx.scale(dpr, dpr);
+  }
+
+  function createParticles() {
+    particles = [];
+    const count = Math.min(Math.floor((canvasW * canvasH) / 12000), 120);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvasW,
+        y: Math.random() * canvasH,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 0.5,
+        pulse: Math.random() * Math.PI * 2,
+        type: Math.random() > 0.7 ? 'gold' : 'teal'
+      });
+    }
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvasW, canvasH);
+
+    // Connection lines
+    const maxDist = 140;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          const alpha = (1 - dist / maxDist) * 0.15;
+          ctx.strokeStyle = particles[i].type === 'gold'
+            ? `rgba(212, 151, 46, ${alpha})`
+            : `rgba(20, 184, 166, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Particles
+    for (const p of particles) {
+      p.pulse += 0.02;
+      const pulseScale = 0.85 + Math.sin(p.pulse) * 0.15;
+      const r = p.r * pulseScale;
+
+      // Mouse interaction
+      const dmx = p.x - mouseX;
+      const dmy = p.y - mouseY;
+      const dmDist = Math.sqrt(dmx * dmx + dmy * dmy);
+      if (dmDist < 200 && dmDist > 0) {
+        const force = (200 - dmDist) / 200 * 0.3;
+        p.vx += (dmx / dmDist) * force;
+        p.vy += (dmy / dmDist) * force;
+      }
+
+      // Damping
+      p.vx *= 0.98;
+      p.vy *= 0.98;
+
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Wrap
+      if (p.x < -10) p.x = canvasW + 10;
+      if (p.x > canvasW + 10) p.x = -10;
+      if (p.y < -10) p.y = canvasH + 10;
+      if (p.y > canvasH + 10) p.y = -10;
+
+      // Draw glow
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4);
+      if (p.type === 'gold') {
+        grad.addColorStop(0, `rgba(212, 151, 46, ${0.6 * pulseScale})`);
+        grad.addColorStop(1, 'rgba(212, 151, 46, 0)');
+      } else {
+        grad.addColorStop(0, `rgba(20, 184, 166, ${0.5 * pulseScale})`);
+        grad.addColorStop(1, 'rgba(20, 184, 166, 0)');
+      }
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Core
+      ctx.fillStyle = p.type === 'gold'
+        ? `rgba(252, 211, 77, ${0.9 * pulseScale})`
+        : `rgba(94, 234, 212, ${0.8 * pulseScale})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    animFrame = requestAnimationFrame(drawParticles);
+  }
+
+  // Mouse tracking for hero
+  document.getElementById('hero').addEventListener('mousemove', function(e) {
+    const rect = heroCanvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+  });
+
+  // Init hero particles
+  resizeCanvas();
+  createParticles();
+  drawParticles();
+
+  let resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      resizeCanvas();
+      createParticles();
+    }, 200);
+  });
+
+  // ==========================================
+  // EEG WAVEFORM ANIMATIONS
+  // ==========================================
+  function animateEEG(canvas, speed, amplitude, channels) {
+    if (!canvas) return;
+    const ectx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w, h;
+
+    function resize() {
+      w = canvas.parentElement.offsetWidth;
+      h = canvas.parentElement.offsetHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      ectx.scale(dpr, dpr);
+    }
+    resize();
+
+    let t = Math.random() * 1000;
+    const colors = [
+      'rgba(20, 184, 166, 0.7)',
+      'rgba(212, 151, 46, 0.5)',
+      'rgba(94, 234, 212, 0.4)',
+      'rgba(168, 85, 247, 0.4)',
+    ];
+
+    function draw() {
+      ectx.clearRect(0, 0, w, h);
+      t += speed;
+
+      for (let c = 0; c < Math.min(channels, colors.length); c++) {
+        ectx.strokeStyle = colors[c];
+        ectx.lineWidth = 1;
+        ectx.beginPath();
+        const yBase = (h / (channels + 1)) * (c + 1);
+
+        for (let x = 0; x < w; x++) {
+          const freq1 = 0.02 + c * 0.008;
+          const freq2 = 0.05 + c * 0.01;
+          const noise = Math.sin(x * 0.15 + t * 3 + c * 2) * amplitude * 0.2;
+          const y = yBase +
+            Math.sin(x * freq1 + t + c) * amplitude * 0.6 +
+            Math.sin(x * freq2 + t * 1.5 + c * 3) * amplitude * 0.3 +
+            noise;
+
+          if (x === 0) ectx.moveTo(x, y);
+          else ectx.lineTo(x, y);
+        }
+        ectx.stroke();
+      }
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // Mini EEG waveforms in dataset cards
+  document.querySelectorAll('[data-eeg-mini]').forEach(function(canvas) {
+    animateEEG(canvas, 0.008, 8, 3);
+  });
+
+  // Large EEG preview
+  const previewChart = document.getElementById('eegPreviewChart');
+  if (previewChart) {
+    animateEEG(previewChart, 0.006, 20, 4);
+  }
+
+  // ==========================================
+  // COUNTER ANIMATION
+  // ==========================================
+  function animateCounters() {
+    document.querySelectorAll('[data-count]').forEach(function(el) {
+      if (el.dataset.animated) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top > window.innerHeight || rect.bottom < 0) return;
+
+      el.dataset.animated = 'true';
+      const target = parseInt(el.dataset.count, 10);
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix || '';
+      const duration = 1200;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // ease-out expo
+        const eased = 1 - Math.pow(1 - progress, 4);
+        const current = Math.round(target * eased);
+        el.textContent = prefix + current.toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    });
+  }
+
+  // ==========================================
+  // SCORE RING ANIMATION
+  // ==========================================
+  function animateScoreRing() {
+    const ring = document.querySelector('.score-ring-fill');
+    if (!ring || ring.dataset.animated) return;
+    const rect = ring.closest('.neuro-score').getBoundingClientRect();
+    if (rect.top > window.innerHeight || rect.bottom < 0) return;
+
+    ring.dataset.animated = 'true';
+    const target = parseInt(ring.dataset.target, 10);
+    const circumference = 314; // 2 * PI * 50
+    const offset = circumference - (target / 100) * circumference;
+    ring.style.strokeDashoffset = offset;
+  }
+
+  // ==========================================
+  // FEED ITEMS REVEAL
+  // ==========================================
+  function revealFeedItems() {
+    document.querySelectorAll('.feed-item:not(.visible)').forEach(function(item, i) {
+      const rect = item.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 40) {
+        setTimeout(function() {
+          item.classList.add('visible');
+        }, i * 80);
+      }
+    });
+  }
+
+  // ==========================================
+  // STAGGERED CARD REVEAL
+  // ==========================================
+  const revealCards = document.querySelectorAll('.dataset-card, .license-card, .explore-card');
+  revealCards.forEach(function(card) {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+  });
+
+  function revealOnScroll() {
+    revealCards.forEach(function(card, i) {
+      if (card.dataset.revealed) return;
+      const rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 60) {
+        card.dataset.revealed = 'true';
+        const siblings = Array.from(card.parentElement.children);
+        const idx = siblings.indexOf(card);
+        setTimeout(function() {
+          card.style.transition = 'opacity 500ms cubic-bezier(0.22, 1, 0.36, 1), transform 500ms cubic-bezier(0.22, 1, 0.36, 1)';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, idx * 100);
+      }
+    });
+  }
+
+  // ==========================================
+  // ENCRYPTION PROGRESS ANIMATION
+  // ==========================================
+  let encryptStarted = false;
+  function animateEncrypt() {
+    if (encryptStarted) return;
+    const bar = document.getElementById('encryptBar');
+    if (!bar) return;
+    const rect = bar.closest('.encrypt-progress').getBoundingClientRect();
+    if (rect.top > window.innerHeight) return;
+
+    encryptStarted = true;
+    const percent = document.getElementById('encryptPercent');
+    const status = document.getElementById('encryptStatus');
+    const stages = [
+      { p: 15, t: 'Generating encryption key...' },
+      { p: 35, t: 'Encrypting channel data (1/64)...' },
+      { p: 55, t: 'Encrypting channel data (32/64)...' },
+      { p: 72, t: 'Encrypting channel data (58/64)...' },
+      { p: 88, t: 'Finalizing AES-256-GCM cipher...' },
+      { p: 100, t: 'Encryption complete. Ready for IPFS upload.' },
+    ];
+
+    let i = 0;
+    function step() {
+      if (i >= stages.length) return;
+      bar.style.width = stages[i].p + '%';
+      percent.textContent = stages[i].p + '%';
+      status.textContent = stages[i].t;
+      i++;
+      if (i < stages.length) {
+        setTimeout(step, 800 + Math.random() * 600);
+      }
+    }
+    setTimeout(step, 400);
+  }
+
+  // ==========================================
+  // NAVIGATION
+  // ==========================================
+  const navTrigger = document.getElementById('navTrigger');
+  const navPanel = document.getElementById('navPanel');
+  const navBackdrop = document.getElementById('navBackdrop');
+
+  navTrigger.addEventListener('click', function() {
+    const isOpen = navPanel.classList.contains('open');
+    navPanel.classList.toggle('open');
+    navTrigger.classList.toggle('active');
+    navTrigger.setAttribute('aria-expanded', !isOpen);
+  });
+
+  navBackdrop.addEventListener('click', function() {
+    navPanel.classList.remove('open');
+    navTrigger.classList.remove('active');
+    navTrigger.setAttribute('aria-expanded', 'false');
+  });
+
+  // Nav link clicks
+  document.querySelectorAll('.nav-drawer a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      navPanel.classList.remove('open');
+      navTrigger.classList.remove('active');
+      navTrigger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ==========================================
+  // MAGNETIC HOVER ON BUTTONS
+  // ==========================================
+  document.querySelectorAll('.magnetic-wrap').forEach(function(wrap) {
+    const btn = wrap.querySelector('.btn');
+    wrap.addEventListener('mousemove', function(e) {
+      const rect = wrap.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = 'translate(' + (x * 0.15) + 'px, ' + (y * 0.15) + 'px)';
+    });
+    wrap.addEventListener('mouseleave', function() {
+      btn.style.transform = 'translate(0, 0)';
+      btn.style.transition = 'transform 300ms cubic-bezier(0.22, 1, 0.36, 1)';
+      setTimeout(function() { btn.style.transition = ''; }, 300);
+    });
+  });
+
+  // ==========================================
+  // RIPPLE EFFECT ON ALL BUTTONS
+  // ==========================================
+  document.querySelectorAll('.btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      btn.appendChild(ripple);
+      setTimeout(function() { ripple.remove(); }, 500);
+    });
+  });
+
+  // ==========================================
+  // CONNECT WALLET (demo interaction)
+  // ==========================================
+  document.getElementById('connectWallet').addEventListener('click', function() {
+    this.textContent = 'Connecting...';
+    const self = this;
+    setTimeout(function() {
+      self.textContent = '9xK4...mP7r';
+      self.style.background = 'var(--bg-elevated)';
+      self.style.color = 'var(--teal-400)';
+      self.style.border = '1px solid var(--teal-500)';
+      // Scroll to dashboard
+      setTimeout(function() {
+        document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+      }, 600);
+    }, 1200);
+  });
+
+  // ==========================================
+  // FILTER TAGS
+  // ==========================================
+  document.querySelectorAll('.filter-tag').forEach(function(tag) {
+    tag.addEventListener('click', function() {
+      document.querySelectorAll('.filter-tag').forEach(function(t) { t.classList.remove('active'); });
+      tag.classList.add('active');
+    });
+  });
+
+  // ==========================================
+  // SCROLL-DRIVEN ANIMATIONS
+  // ==========================================
+  let ticking = false;
+  function onScroll() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        animateCounters();
+        animateScoreRing();
+        revealOnScroll();
+        revealFeedItems();
+        animateEncrypt();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  // Initial check
+  setTimeout(onScroll, 100);
+
+  // ==========================================
+  // FLOATING PARTICLES IN SECTIONS
+  // ==========================================
+  document.querySelectorAll('.particles-bg').forEach(function(container) {
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.animationDuration = (8 + Math.random() * 12) + 's';
+      p.style.animationDelay = (Math.random() * 5) + 's';
+      const size = 1 + Math.random() * 2;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.opacity = (0.06 + Math.random() * 0.12).toFixed(2);
+
+      // Float animation
+      const keyframes = `
+        @keyframes float_${i} {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(${(Math.random()-0.5)*40}px, ${-Math.random()*30}px); }
+          50% { transform: translate(${(Math.random()-0.5)*60}px, ${(Math.random()-0.5)*40}px); }
+          75% { transform: translate(${(Math.random()-0.5)*30}px, ${Math.random()*20}px); }
+        }
+      `;
+      const style = document.createElement('style');
+      style.textContent = keyframes;
+      document.head.appendChild(style);
+      p.style.animation = `float_${i} ${8 + Math.random()*12}s ease-in-out infinite`;
+      p.style.animationDelay = (Math.random() * 5) + 's';
+
+      container.appendChild(p);
+    }
+  });
+
+  // ==========================================
+  // KEYBOARD ACCESSIBILITY
+  // ==========================================
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+      navPanel.classList.remove('open');
+      navTrigger.classList.remove('active');
+      navTrigger.setAttribute('aria-expanded', 'false');
+      navTrigger.focus();
+    }
+    // Close success modal
+    if (e.key === 'Escape') {
+      document.getElementById('successModal').classList.remove('visible');
+    }
+  });
+
+  // Upload area keyboard
+  document.querySelector('.upload-area').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      // Demo: show success modal after delay
+      const self = this;
+      self.querySelector('h3').textContent = 'Processing...';
+      setTimeout(function() {
+        self.querySelector('h3').textContent = 'Drop your neural data files here';
+        document.getElementById('successModal').classList.add('visible');
+      }, 1500);
+    }
+  });
+
+  // Upload area click demo
+  document.querySelector('.upload-area').addEventListener('click', function() {
+    this.querySelector('h3').textContent = 'Processing...';
+    const self = this;
+    setTimeout(function() {
+      self.querySelector('h3').textContent = 'Drop your neural data files here';
+      document.getElementById('successModal').classList.add('visible');
+    }, 1500);
+  });
+
+})();
+</script>
+</body>
+</html>

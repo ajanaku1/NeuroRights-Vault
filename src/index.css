@@ -1,0 +1,287 @@
+@import "tailwindcss";
+
+@theme {
+  /* Base surfaces */
+  --color-base: #06060a;
+  --color-surface: #0d1117;
+  --color-elevated: #161b22;
+  --color-overlay: #21262d;
+
+  /* Borders */
+  --color-border: #30363d;
+  --color-border-subtle: #21262d;
+
+  /* Text */
+  --color-text-primary: #f0f6fc;
+  --color-text-body: #c9d1d9;
+  --color-text-secondary: #8b949e;
+  --color-text-muted: #484f58;
+
+  /* Primary accent — neural teal */
+  --color-accent: #00f5d4;
+  --color-accent-hover: #33f7dd;
+  --color-accent-dim: #00f5d412;
+  --color-accent-glow: #00f5d430;
+
+  /* Secondary accent — purple (matches logo) */
+  --color-purple: #6c5ce7;
+  --color-purple-dim: #6c5ce715;
+
+  /* Gold — landing page emphasis */
+  --color-gold: #D4AF37;
+  --color-gold-dim: #D4AF3715;
+
+  /* Semantic */
+  --color-success: #00d68f;
+  --color-success-dim: #00d68f15;
+  --color-warning: #f0a500;
+  --color-warning-dim: #f0a50015;
+  --color-danger: #ff4757;
+  --color-danger-dim: #ff475715;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+}
+
+/* ===== BASE ===== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-overlay) transparent;
+}
+
+body {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== FONT UTILITIES ===== */
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-editorial {
+  font-family: 'Crimson Pro', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== TABULAR NUMBERS ===== */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== ANIMATIONS ===== */
+
+/* Stagger entrance for bento tiles */
+@keyframes tile-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-tile-enter {
+  animation: tile-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Slide up (general) */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Slide in from left (sidebar) */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Neural pulse (teal glow) */
+@keyframes pulse-neural {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-neural {
+  animation: pulse-neural 2s ease-in-out infinite;
+}
+
+/* Shimmer for loading skeletons */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Scan line overlay for landing page */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* Gold shimmer text */
+@keyframes gold-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer-gold {
+  background: linear-gradient(90deg, #D4AF37, #F5D77A, #D4AF37, #B8941F, #D4AF37);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-shimmer 4s linear infinite;
+}
+
+/* Counter tick animation */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count {
+  animation: count-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Sidebar active indicator slide */
+@keyframes indicator-slide {
+  from { opacity: 0; transform: scaleY(0.6); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+
+.animate-indicator {
+  animation: indicator-slide 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Draw line (SVG) */
+@keyframes draw-line {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Fade in stagger helper - use with inline style delay */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ===== GLASS EFFECT ===== */
+.glass {
+  background: rgba(13, 17, 23, 0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== SIDEBAR LAYOUT ===== */
+/* Sidebar is position:fixed with margin-left on content area.
+   No CSS grid needed — handled via Tailwind utilities. */
+
+/* ===== BENTO GRID ===== */
+.bento-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.bento-grid-2 {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.bento-grid-3 {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.bento-grid-4 {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1024px) {
+  .bento-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .bento-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .bento-grid-4, .bento-grid-3, .bento-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== BENTO TILE ===== */
+.bento-tile {
+  background: var(--color-surface, #0d1117);
+  border: 1px solid var(--color-border-subtle, #21262d);
+  padding: 20px;
+  transition: border-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-tile:hover {
+  border-color: var(--color-accent, #00f5d4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 245, 212, 0.06);
+}
+
+/* ===== INPUT STYLES ===== */
+input, textarea, select {
+  font-size: 16px; /* Prevent iOS zoom */
+}
+
+/* ===== FOCUS STYLES ===== */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

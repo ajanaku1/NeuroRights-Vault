@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Proposals | NeuroRights Vault</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #1A1A1A;
+            --text-primary: #FFFFFF;
+            --text-muted: #666666;
+            --accent-green: #047857;
+            --accent-gold: #D4AF37;
+            --border: #2A2A2A;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #064E3B 0%, #047857 100%);
+            padding: 32px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-gold);
+        }
+        .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 14px; }
+        .catalogue {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+        }
+        .proposal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s ease-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .proposal-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .preview-frame {
+            position: relative;
+            aspect-ratio: 16/10;
+            background: #000;
+            overflow: hidden;
+        }
+        .preview-frame iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+        .preview-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.2s ease-out;
+        }
+        .proposal-card:hover .preview-overlay { opacity: 1; }
+        .open-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .card-info { padding: 20px; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .card-title { font-size: 20px; font-weight: 600; }
+        .dna-badge {
+            background: var(--bg-primary);
+            border: 1px solid var(--accent-gold);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 11px;
+            color: var(--accent-gold);
+        }
+        .card-description {
+            font-size: 14px;
+            color: #A0A0A0;
+            margin-bottom: 16px;
+        }
+        .dna-breakdown {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .dna-gene {
+            background: var(--bg-primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .dna-gene strong { color: #A0A0A0; }
+        .inspiration {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            .catalogue { grid-template-columns: 1fr; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Design Proposals</h1>
+        <p>NeuroRights Vault | 3 proposals | Generated 2026-03-30</p>
+    </header>
+    <main class="catalogue">
+        <!-- Proposal 1: Neural Cortex -->
+        <div class="proposal-card">
+            <div class="preview-frame">
+                <iframe src="proposal-1.html" loading="lazy"></iframe>
+                <div class="preview-overlay">
+                    <a href="proposal-1.html" class="open-btn">Open Proposal</a>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <span class="card-title">Neural Cortex</span>
+                    <span class="dna-badge">DNA-F-H-I-G-X</span>
+                </div>
+                <p class="card-description">Cyberpunk meets Afrofuturism. Full-bleed immersive experience with animated neural network particles, scan line overlays, gold shimmer accents, and teal-to-gold gradients. Hidden nav slides in from void.</p>
+                <div class="dna-breakdown">
+                    <span class="dna-gene"><strong>L:</strong> Full-bleed</span>
+                    <span class="dna-gene"><strong>N:</strong> Hidden</span>
+                    <span class="dna-gene"><strong>H:</strong> Immersive</span>
+                    <span class="dna-gene"><strong>C:</strong> Gradient</span>
+                    <span class="dna-gene"><strong>T:</strong> Mixed</span>
+                </div>
+                <p class="inspiration">Inspired by: Cyberpunk Interfaces (terminal aesthetics) + Afrofuturism (gold-on-dark, geometric patterns)</p>
+            </div>
+        </div>
+
+        <!-- Proposal 2: Synapse Grid -->
+        <div class="proposal-card">
+            <div class="preview-frame">
+                <iframe src="proposal-2.html" loading="lazy"></iframe>
+                <div class="preview-overlay">
+                    <a href="proposal-2.html" class="open-btn">Open Proposal</a>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <span class="card-title">Synapse Grid</span>
+                    <span class="dna-badge">DNA-B-S-M-D-S</span>
+                </div>
+                <p class="card-description">Professional control center. Bento grid tiles with collapsible sidebar, animated sparklines, ticker counters, and spring-physics toggles. Dense, data-rich, and beautifully organized. Navy + amber duotone.</p>
+                <div class="dna-breakdown">
+                    <span class="dna-gene"><strong>L:</strong> Bento</span>
+                    <span class="dna-gene"><strong>N:</strong> Side</span>
+                    <span class="dna-gene"><strong>H:</strong> Minimal</span>
+                    <span class="dna-gene"><strong>C:</strong> Duotone</span>
+                    <span class="dna-gene"><strong>T:</strong> Sans</span>
+                </div>
+                <p class="inspiration">Inspired by: Linear.app (restrained micro-interactions) + Bloomberg (dense data hierarchy)</p>
+            </div>
+        </div>
+
+        <!-- Proposal 3: Brainwave Protocol -->
+        <div class="proposal-card">
+            <div class="preview-frame">
+                <iframe src="proposal-3.html" loading="lazy"></iframe>
+                <div class="preview-overlay">
+                    <a href="proposal-3.html" class="open-btn">Open Proposal</a>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <span class="card-title">Brainwave Protocol</span>
+                    <span class="dna-badge">DNA-A-O-F-M-E</span>
+                </div>
+                <p class="card-description">Constitutional elegance. Asymmetric serif typography as the star, full-screen curtain-wipe nav, word-by-word hero reveal, monochrome with electric teal accent. Swiss precision meets digital rights.</p>
+                <div class="dna-breakdown">
+                    <span class="dna-gene"><strong>L:</strong> Asymmetric</span>
+                    <span class="dna-gene"><strong>N:</strong> Overlay</span>
+                    <span class="dna-gene"><strong>H:</strong> Full-viewport</span>
+                    <span class="dna-gene"><strong>C:</strong> Monochrome</span>
+                    <span class="dna-gene"><strong>T:</strong> Serif</span>
+                </div>
+                <p class="inspiration">Inspired by: Swiss Design (mathematical precision) + Vercel (extreme restraint, monochrome)</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
