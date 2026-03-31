@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWriteContract, usePublicClient } from 'wagmi'
 import { Database, Users, DollarSign, Clock, ChevronDown, ChevronUp, ExternalLink, Loader2, Wallet } from 'lucide-react'

@@ -1,6 +1,6 @@
 import { LitNodeClient } from '@lit-protocol/lit-node-client'
 import { encryptString, decryptToString } from '@lit-protocol/encryption'
-import { LIT_NETWORK, LIT_ABILITY } from '@lit-protocol/constants'
+import { LIT_ABILITY } from '@lit-protocol/constants'
 import {
   createSiweMessage,
   generateAuthSig,
@@ -119,8 +119,8 @@ export async function litDecrypt(
   const evmContractConditions = getAccessControlConditions(datasetId)
 
   // Get ethers signer from wallet provider
-  const { BrowserProvider } = await import('ethers')
-  const provider = new BrowserProvider(walletProvider)
+  const ethersModule = await import('ethers') as any
+  const provider = new (ethersModule.BrowserProvider || ethersModule.providers?.Web3Provider)(walletProvider)
   const signer = await provider.getSigner()
   const address = await signer.getAddress()
 
@@ -130,7 +130,7 @@ export async function litDecrypt(
     expiration: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
     resourceAbilityRequests: [
       {
-        resource: new LitAccessControlConditionResource('*'),
+        resource: new LitAccessControlConditionResource('*') as any,
         ability: LIT_ABILITY.AccessControlConditionDecryption,
       },
     ],
@@ -138,7 +138,7 @@ export async function litDecrypt(
       const toSign = await createSiweMessage({
         uri: uri!,
         expiration: expiration!,
-        resources: resourceAbilityRequests!,
+        resources: resourceAbilityRequests! as any,
         walletAddress: address,
         nonce: await client.getLatestBlockhash(),
         litNodeClient: client,

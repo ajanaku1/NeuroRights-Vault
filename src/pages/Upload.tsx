@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react'
 import { useAccount, useSignMessage, useWriteContract, usePublicClient, useReadContract } from 'wagmi'
 import { parseEther, keccak256, toHex } from 'viem'
-import { Upload as UploadIcon, FileText, Brain, Check, Loader2, Shield, Lock, Globe } from 'lucide-react'
+import { Upload as UploadIcon, Brain, Check, Loader2, Lock } from 'lucide-react'
 import { parseEEGCsv, getEEGStats, type EEGData } from '../lib/eeg'
 import { encryptData, arrayBufferToHex } from '../lib/encryption'
-import { uploadToIPFS, uploadRawToIPFS } from '../lib/storacha'
+import { uploadRawToIPFS } from '../lib/storacha'
 const getLitEncrypt = () => import('../lib/lit').then(m => m.litEncrypt)
 import { NEURORIGHTS_VAULT_ADDRESS, NEURORIGHTS_VAULT_ABI } from '../lib/contract'
 import EEGChart from '../components/EEGChart'
@@ -107,9 +107,6 @@ export default function Upload() {
         setStep('upload')
         // Pack IV + ciphertext together so decryption is possible
         const ivHex = Array.from(iv).map(b => b.toString(16).padStart(2, '0')).join('')
-        const combined = new Blob([ivHex + '\n', new Uint8Array(encrypted)])
-        const file = new File([combined], `${fileName.replace('.csv', '')}.enc`, { type: 'application/octet-stream' })
-        const { Client } = await import('@storacha/client')
         // Use uploadRawToIPFS for the combined data
         const combinedText = ivHex + '\n' + arrayBufferToHex(encrypted)
         ipfsCid = await uploadRawToIPFS(combinedText, `${fileName.replace('.csv', '')}.enc`)

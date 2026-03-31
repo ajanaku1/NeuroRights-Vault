@@ -79,7 +79,7 @@ export function useAllDatasets() {
     for (let i = 0; i < rawDatasets.length; i++) {
       const result = rawDatasets[i]
       if (result.status === 'success' && result.result) {
-        const r = result.result as any[]
+        const r = result.result as unknown as any[]
         const owner = r[0] as string
         const cidHash = r[1] as string
         const metadata = r[2] as string

@@ -15,7 +15,7 @@ import {
   Check,
   X,
 } from 'lucide-react'
-import { usePendingRequests, useResearcherNotifications, useAllDatasets, useAllMyLicenses } from '../lib/hooks'
+import { usePendingRequests, useResearcherNotifications, useAllDatasets } from '../lib/hooks'
 import { NEURORIGHTS_VAULT_ADDRESS, NEURORIGHTS_VAULT_ABI } from '../lib/contract'
 import { toast } from '../lib/toast'
 import Toasts from './Toasts'

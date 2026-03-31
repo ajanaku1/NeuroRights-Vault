@@ -1,5 +1,5 @@
-import { Upload, UserCheck, UserX, DollarSign, Eye, Database, Loader2, ExternalLink, CheckCircle, XCircle } from 'lucide-react'
-import { useContractEvents, type OnChainEvent } from '../lib/hooks'
+import { Upload, UserCheck, UserX, Eye, Database, Loader2, ExternalLink, CheckCircle, XCircle } from 'lucide-react'
+import { useContractEvents } from '../lib/hooks'
 
 const eventConfig: Record<string, { icon: typeof Upload; color: string; bg: string }> = {
   DatasetRegistered: { icon: Upload, color: 'text-accent', bg: 'bg-accent-dim' },

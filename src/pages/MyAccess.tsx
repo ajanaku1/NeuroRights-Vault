@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAccount, useConnectorClient } from 'wagmi'
 import { Link } from 'react-router-dom'
-import { Database, Clock, Zap, Download, FolderKey, Loader2, Hourglass, Lock, Eye } from 'lucide-react'
+import { Database, Clock, Zap, Download, FolderKey, Loader2, Hourglass, Lock } from 'lucide-react'
 import { useMyLicensedDatasets } from '../lib/hooks'
 import { fetchFromIPFS } from '../lib/storacha'
 const getLitDecrypt = () => import('../lib/lit').then(m => m.litDecrypt)
@@ -20,8 +20,7 @@ function DecryptButton({ dataset }: { dataset: OnChainDataset }) {
     try {
       const ciphertext = await fetchFromIPFS(dataset.ipfsCid)
       // Parse dataToEncryptHash from on-chain metadata
-      let metadata: any = {}
-      try { metadata = JSON.parse(dataset.description) } catch {}
+      try { JSON.parse(dataset.description) } catch {}
       // dataToEncryptHash is stored alongside ipfsCid in the metadata JSON
       // We need to get it from the raw on-chain metadata, which is parsed in hooks.ts
       // The dataset object has description from parsed metadata, but we stored dataToEncryptHash there

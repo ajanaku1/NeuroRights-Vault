@@ -32,7 +32,7 @@ export async function encryptData(data: string, walletSignature: string): Promis
 export async function decryptData(encrypted: ArrayBuffer, iv: Uint8Array, walletSignature: string): Promise<string> {
   const key = await deriveKey(walletSignature)
   const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: iv as unknown as Uint8Array<ArrayBuffer> },
     key,
     encrypted
   )
